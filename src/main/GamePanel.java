@@ -10,8 +10,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Objects;
 
 public class GamePanel extends JPanel implements Runnable{
+    int score = 0;
     final int originalTileSize = 16;
     final int scale = 3;
     public final int tileSize = originalTileSize * scale;
@@ -20,9 +22,10 @@ public class GamePanel extends JPanel implements Runnable{
     public final int screenWidth = tileSize * maxScreenCol; // 758
     public final int screenHeight = tileSize * maxScreenRow; // 576
     int FPS = 60;
-
+    public int groundLevel = 576 - tileSize;
     public BufferedImage gameOverImage;
     KeyHandler keyHandler = new KeyHandler();
+    UI ui = new UI(this);
     Thread gameThread;
     boolean isGameOver = false;
     Player player = new Player(this, keyHandler);
@@ -45,9 +48,9 @@ public class GamePanel extends JPanel implements Runnable{
        gameThread = new Thread(this);
        gameThread.start();
         //Pipes
-        pipe1.setCoords(100, 400);
-        pipe2.setCoords(100, 400 - tileSize);
-        pipe3.setCoords(400, 400);
+        pipe1.setCoords(100, groundLevel);
+        pipe2.setCoords(100, groundLevel - tileSize);
+        pipe3.setCoords(500, groundLevel);
         //Pipes
     }
     public boolean topCollision(Entity a, Entity b){
@@ -55,6 +58,8 @@ public class GamePanel extends JPanel implements Runnable{
         Rectangle p = new Rectangle(b.x, b.y, tileSize, tileSize);
         if (r.intersects(p) && a.y < b.y)
         {
+            a.calculatedFallSpeed = 0;
+            a.y = b.y - tileSize;
             return true;
         }
         return false;
@@ -62,8 +67,21 @@ public class GamePanel extends JPanel implements Runnable{
     public boolean borderCollision(Entity a, Entity b){
         Rectangle r = new Rectangle(a.x, a.y, tileSize, tileSize);
         Rectangle p = new Rectangle(b.x, b.y, tileSize, tileSize);
-        if (r.intersects(p) && (a.y == b.y))
+        if (r.intersects(p) && (a.y >= b.y))
         {
+            if(Objects.equals(a.state, "right")) {
+                a.speed = -a.speed;
+                a.x = a.x + a.speed;
+                a.speed = -a.speed;
+            }
+            else if(Objects.equals(a.state, "left")) {
+                a.speed = -a.speed;
+                a.x = a.x - a.speed;
+                a.speed = -a.speed;
+            }
+            else{
+                a.speed = -a.speed;
+            }
             return true;
         }
         return false;
@@ -102,10 +120,18 @@ public class GamePanel extends JPanel implements Runnable{
         mushroom.update();
 
         if(topCollision(player, mushroom)){
-            player.calculatedFallSpeed = 0;
             mushroom.destroy();
+            score++;
         }
-
+        topCollision(player, pipe1);
+        topCollision(player, pipe2);
+        topCollision(player, pipe3);
+        borderCollision(player, pipe1);
+        borderCollision(player, pipe2);
+        borderCollision(player, pipe3);
+        borderCollision(mushroom, pipe1);
+        borderCollision(mushroom, pipe2);
+        borderCollision(mushroom, pipe3);
         if(borderCollision(player, mushroom)){
             try {
                 gameOver();
@@ -113,7 +139,6 @@ public class GamePanel extends JPanel implements Runnable{
                 throw new RuntimeException(e);
             }
         }
-
     }
     public void paintComponent(Graphics g){
         super.paintComponent(g);
@@ -124,6 +149,7 @@ public class GamePanel extends JPanel implements Runnable{
             pipe1.draw(g2);
             pipe2.draw(g2);
             pipe3.draw(g2);
+            ui.draw(g2);
             g2.dispose();
         }
         else g2.drawImage(gameOverImage, 0, 0, screenWidth, screenHeight, null);

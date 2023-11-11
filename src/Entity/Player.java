@@ -14,7 +14,6 @@ public class Player extends Entity{
     final static double velocity = 1;
     final static int jumpSpeed = 10;
     public BufferedImage image = null;
-    public int calculatedFallSpeed = 0;
     public Player(GamePanel gp, KeyHandler keyHandler){
         this.gp = gp;
         this.keyHandler = keyHandler;
@@ -22,6 +21,7 @@ public class Player extends Entity{
         setDefaultValues();
     }
     public void setDefaultValues(){
+        calculatedFallSpeed = 0;
         x = 100;
         y = 16;
         speed = 4;
@@ -68,13 +68,13 @@ public class Player extends Entity{
             }
             spriteCounter = 0;
         }
-        if(y < 400){
+        if(y < gp.groundLevel){
             y += calculatedFallSpeed / 2;
             calculatedFallSpeed += velocity;
         }
         else {
             calculatedFallSpeed = 0;
-            y = 400;
+            y = gp.groundLevel;
             if(Objects.equals(prevState, "right")){
                 image = stay_r;
             }

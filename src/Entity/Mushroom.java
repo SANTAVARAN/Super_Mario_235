@@ -20,10 +20,10 @@ public class Mushroom extends Entity{
         setDefaultValues();
     }
     public void setDefaultValues(){
-        x = 100;
-        y = 400;
+        x = 200;
+        y = gp.groundLevel;
         speed = 2;
-        state = "right";
+        state = "mushroom";
     }
     public void destroy(){
         x = 0;
