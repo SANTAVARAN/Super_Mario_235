@@ -1,5 +1,6 @@
 package main;
 
+import Entity.Entity;
 import Entity.Mushroom;
 import Entity.Player;
 
@@ -31,6 +32,15 @@ public class GamePanel extends JPanel implements Runnable{
        gameThread = new Thread(this);
        gameThread.start();
     }
+    public boolean Collision(Entity a, Entity b){
+        Rectangle r = new Rectangle(a.x, a.y, tileSize, tileSize);
+        Rectangle p = new Rectangle(b.x, b.y, tileSize, tileSize);
+        if (r.intersects(p) && a.y < b.y)
+        {
+            return true;
+        }
+        return false;
+    }
     @Override
     public void run() {
         double drawInterval = 1000000000 / FPS;
@@ -54,6 +64,9 @@ public class GamePanel extends JPanel implements Runnable{
     public void update(){
         player.update();
         mushroom.update();
+        if(Collision(player, mushroom)){
+            player.calculatedFallSpeed = 0;
+        }
     }
     public void paintComponent(Graphics g){
         super.paintComponent(g);

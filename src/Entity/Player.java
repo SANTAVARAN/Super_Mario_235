@@ -14,7 +14,7 @@ public class Player extends Entity{
     final static double velocity = 1;
     final static int jumpSpeed = 10;
     public BufferedImage image = null;
-    int calculatedFallSpeed = 0;
+    public int calculatedFallSpeed = 0;
     public Player(GamePanel gp, KeyHandler keyHandler){
         this.gp = gp;
         this.keyHandler = keyHandler;
@@ -74,6 +74,7 @@ public class Player extends Entity{
         }
         else {
             calculatedFallSpeed = 0;
+            y = 400;
             if(Objects.equals(prevState, "right")){
                 image = stay_r;
             }
