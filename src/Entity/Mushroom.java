@@ -11,6 +11,7 @@ import main.KeyHandler;
 
 public class Mushroom extends Entity{
     GamePanel gp;
+    boolean isAlive = true;
     boolean direction = true;
     BufferedImage image = null;
     public Mushroom(GamePanel gp){
@@ -23,6 +24,12 @@ public class Mushroom extends Entity{
         y = 400;
         speed = 2;
         state = "right";
+    }
+    public void destroy(){
+        x = 0;
+        y = 0;
+        speed = 0;
+        isAlive = false;
     }
     public void getMushroomImage(){
         try {
@@ -47,7 +54,9 @@ public class Mushroom extends Entity{
         }
     }
     public void draw(Graphics2D g2) {
-        image = stillMushroom;
-        g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
+        if(isAlive) {
+            image = stillMushroom;
+            g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
+        }
     }
 }
