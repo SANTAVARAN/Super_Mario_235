@@ -4,6 +4,7 @@ import Entity.Entity;
 import Entity.Mushroom;
 import Entity.Player;
 import Entity.Pipe;
+import Entity.Princess;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -34,7 +35,7 @@ public class GamePanel extends JPanel implements Runnable{
     boolean isGameOver = false;
     Player player = new Player(this, keyHandler);
     Mushroom mushroom = new Mushroom(this);
-
+    Princess princess = new Princess(this);
     //Pipes
     ArrayList<Pipe> topPipes = new ArrayList<Pipe>();
     ArrayList<Pipe> sidePipes = new ArrayList<Pipe>();
@@ -158,6 +159,7 @@ public class GamePanel extends JPanel implements Runnable{
         if(!isGameOver) {
             player.draw(g2);
             mushroom.draw(g2);
+            princess.draw(g2);
             for(int j = 0; j < pipesQuantity; j++){
                 topPipes.get(j).draw(g2);
             }
