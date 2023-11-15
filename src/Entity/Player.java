@@ -59,6 +59,9 @@ public class Player extends Entity{
             state = "up";
             y -= jumpSpeed;
         }
+        if(prevState == "up" && state != "up"){
+            calculatedFallSpeed = 0;
+        }
         spriteCounter++;
         if(spriteCounter > 10){
             if(spriteNum == 1){

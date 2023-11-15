@@ -4,16 +4,20 @@ import Entity.Entity;
 import Entity.Mushroom;
 import Entity.Player;
 import Entity.Pipe;
-
+import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class GamePanel extends JPanel implements Runnable{
     int score = 0;
+    int pipesQuantity = 5;
+    Random randomPipeSeed = new Random();
     final int originalTileSize = 16;
     final int scale = 3;
     public final int tileSize = originalTileSize * scale;
@@ -32,9 +36,8 @@ public class GamePanel extends JPanel implements Runnable{
     Mushroom mushroom = new Mushroom(this);
 
     //Pipes
-    Pipe pipe1 = new Pipe(this, false);
-    Pipe pipe2 = new Pipe(this, true);
-    Pipe pipe3 = new Pipe(this, true);
+    ArrayList<Pipe> topPipes = new ArrayList<Pipe>();
+    ArrayList<Pipe> sidePipes = new ArrayList<Pipe>();
     //Pipes
 
     public GamePanel(){
@@ -48,9 +51,18 @@ public class GamePanel extends JPanel implements Runnable{
        gameThread = new Thread(this);
        gameThread.start();
         //Pipes
-        pipe1.setCoords(100, groundLevel);
-        pipe2.setCoords(100, groundLevel - tileSize);
-        pipe3.setCoords(500, groundLevel);
+        for(int j = 0; j < pipesQuantity; j++){
+            Pipe pipe = new Pipe(this, true);
+            pipe.setCoords(randomPipeSeed.nextInt(0, 20) * tileSize, randomPipeSeed.nextInt(screenHeight - 3 * tileSize, screenHeight - tileSize));
+            topPipes.add(pipe);
+        }
+        for(int j = 0; j < pipesQuantity; j++){
+            for(int i = 576; i > topPipes.get(j).getCoords(false); i-=48){
+                Pipe pipe = new Pipe(this, false);
+                pipe.setCoords(topPipes.get(j).getCoords(true), i);
+                sidePipes.add(pipe);
+            }
+        }
         //Pipes
     }
     public boolean topCollision(Entity a, Entity b){
@@ -118,20 +130,10 @@ public class GamePanel extends JPanel implements Runnable{
     public void update(){
         player.update();
         mushroom.update();
-
         if(topCollision(player, mushroom)){
             mushroom.destroy();
             score++;
         }
-        topCollision(player, pipe1);
-        topCollision(player, pipe2);
-        topCollision(player, pipe3);
-        borderCollision(player, pipe1);
-        borderCollision(player, pipe2);
-        borderCollision(player, pipe3);
-        borderCollision(mushroom, pipe1);
-        borderCollision(mushroom, pipe2);
-        borderCollision(mushroom, pipe3);
         if(borderCollision(player, mushroom)){
             try {
                 gameOver();
@@ -143,12 +145,25 @@ public class GamePanel extends JPanel implements Runnable{
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+        for(int j = 0; j < pipesQuantity; j++){
+            borderCollision(mushroom, topPipes.get(j));
+            borderCollision(player, topPipes.get(j));
+            topCollision(player, topPipes.get(j));
+        }
+        for(int j = 0; j < sidePipes.size(); j++){
+            borderCollision(mushroom, sidePipes.get(j));
+            borderCollision(player, sidePipes.get(j));
+            topCollision(player, sidePipes.get(j));
+        }
         if(!isGameOver) {
             player.draw(g2);
             mushroom.draw(g2);
-            pipe1.draw(g2);
-            pipe2.draw(g2);
-            pipe3.draw(g2);
+            for(int j = 0; j < pipesQuantity; j++){
+                topPipes.get(j).draw(g2);
+            }
+            for(int j = 0; j < sidePipes.size(); j++){
+                sidePipes.get(j).draw(g2);
+            }
             ui.draw(g2);
             g2.dispose();
         }

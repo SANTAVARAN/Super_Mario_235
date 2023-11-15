@@ -14,6 +14,12 @@ public class Pipe extends Entity{
         this.isTop = isTop;
         getPipeImage();
     }
+    public int getCoords(boolean type){
+        if(type){
+            return this.x;
+        }
+        return this.y;
+    }
     public void getPipeImage(){
         try {
             if(isTop) {
