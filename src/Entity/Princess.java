@@ -7,36 +7,35 @@ import java.io.IOException;
 import java.util.Objects;
 
 import main.GamePanel;
-import main.KeyHandler;
 
 public class Princess extends Entity{
     GamePanel gp;
     BufferedImage image = null;
-    BufferedImage princessImage;
     public Princess(GamePanel gp){
+        getPrincessImage();
         this.gp = gp;
-        getFinishImage();
         setDefaultValues();
     }
     public void setDefaultValues(){
         x = 500;
-        y = gp.groundLevel - 100;
+        y = 0;
     }
     public void destroy(){
         x = 0;
         y = 0;
         speed = 0;
     }
-    public void getFinishImage(){
+    public void getPrincessImage(){
         try {
-            princessImage = ImageIO.read(getClass().getResourceAsStream("/resource/princess/princess.png"));
+            princessImage = ImageIO.read(getClass().getResourceAsStream("/resource/princess/princess-2.png"));
+            System.out.println("Princess image uploaded");
         }
         catch (IOException e){
             e.printStackTrace();
         }
     }
     public void draw(Graphics2D g2) {
-        image = stillMushroom;
+        image = princessImage;
         g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
     }
 }

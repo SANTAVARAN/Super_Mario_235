@@ -15,7 +15,6 @@ public class KeyHandler implements KeyListener {
         int code = e.getKeyCode();
         if(code == KeyEvent.VK_SPACE){
             spacePressed = true;
-            System.out.println("Space Pressed");
         }
         if(code == KeyEvent.VK_A){
             aPressed = true;

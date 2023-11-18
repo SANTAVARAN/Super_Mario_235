@@ -24,9 +24,11 @@ public class Pipe extends Entity{
         try {
             if(isTop) {
                 image = ImageIO.read(getClass().getResourceAsStream("/resource/pipe/pipe_top.png"));
+                System.out.println("Top pipe image uploaded");
             }
             else {
                 image = ImageIO.read(getClass().getResourceAsStream("/resource/pipe/pipe.png"));
+                System.out.println("Side pipe image uploaded");
             }
         }
         catch (IOException e){

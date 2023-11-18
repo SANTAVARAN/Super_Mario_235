@@ -34,6 +34,7 @@ public class Mushroom extends Entity{
     public void getMushroomImage(){
         try {
             stillMushroom = ImageIO.read(getClass().getResourceAsStream("/resource/mushroom/mushroom.png"));
+            System.out.println("Mushroom image uploaded");
         }
         catch (IOException e){
             e.printStackTrace();

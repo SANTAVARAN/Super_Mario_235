@@ -38,6 +38,7 @@ public class Player extends Entity{
             fall_r = ImageIO.read(getClass().getResourceAsStream("/resource/player/fall_right.png"));
             stay_r = ImageIO.read(getClass().getResourceAsStream("/resource/player/stay_right.png"));
             stay_l = ImageIO.read(getClass().getResourceAsStream("/resource/player/stay_left.png"));
+            System.out.println("Mario images uploaded");
         }
         catch (IOException e){
             e.printStackTrace();
@@ -59,9 +60,12 @@ public class Player extends Entity{
             state = "up";
             y -= jumpSpeed;
         }
-        if(prevState == "up" && state != "up"){
-            calculatedFallSpeed = 0;
+        /*if(Objects.equals(prevState, "up") && !Objects.equals(state, "up")){
+            //calculatedFallSpeed = -calculatedFallSpeed;
+            prevState = state;
+            state = "falling";
         }
+        */
         spriteCounter++;
         if(spriteCounter > 10){
             if(spriteNum == 1){
@@ -72,7 +76,7 @@ public class Player extends Entity{
             spriteCounter = 0;
         }
         if(y < gp.groundLevel){
-            y += calculatedFallSpeed / 2;
+            y += calculatedFallSpeed / 4;
             calculatedFallSpeed += velocity;
         }
         else {
