@@ -3,6 +3,7 @@ package main;
 import Entity.Entity;
 import Entity.Mushroom;
 import Entity.Player;
+import Entity.Coin;
 import Entity.Pipe;
 import Entity.LuckyBox;
 import Entity.Princess;
@@ -18,7 +19,7 @@ import java.util.Objects;
 
 public class GamePanel extends JPanel implements Runnable{
     int score = 0;
-
+    public int internalTime = 0;
     //Game settings
     final int originalTileSize = 16;
     final int scale = 3;
@@ -27,7 +28,7 @@ public class GamePanel extends JPanel implements Runnable{
     final int maxScreenRow = 12;
     public final int screenWidth = tileSize * maxScreenCol; // 758
     public final int screenHeight = tileSize * maxScreenRow; // 576
-    int FPS = 60;
+    public int FPS = 60;
     public int groundLevel = 576 - 3 * tileSize + 19;
     //Game settings
 
@@ -53,11 +54,13 @@ public class GamePanel extends JPanel implements Runnable{
     //Objects initialization
 
     //World generation
-    int boxesStartHeight = 1;
-    int pipesQuantity = 5;
+    int boxesStartHeight = 4;
+    int boxesEndHeight = 5;
+    int pipesQuantity = 10;
     int boxesQuantity = 3;
     Random randomSeed = new Random();
     ArrayList<Pipe> topPipes = new ArrayList<Pipe>();
+    ArrayList<Coin> coins = new ArrayList<Coin>();
     ArrayList<LuckyBox> boxes = new ArrayList<LuckyBox>();
     ArrayList<Pipe> sidePipes = new ArrayList<Pipe>();
     //World generation
@@ -70,8 +73,8 @@ public class GamePanel extends JPanel implements Runnable{
         this.setFocusable(true);
     }
     public void startGameThread(){
-       gameThread = new Thread(this);
-       gameThread.start();
+        gameThread = new Thread(this);
+        gameThread.start();
         try {
             backgroundImage = ImageIO.read(getClass().getResourceAsStream("/resource/misc/backgroundimage.jpg"));
         } catch (IOException e) {
@@ -92,8 +95,11 @@ public class GamePanel extends JPanel implements Runnable{
             }
         }
         for(int j = 0; j < boxesQuantity; j++){
-            LuckyBox luckyBox = new LuckyBox(this);
-            luckyBox.setCoords(randomSeed.nextInt(0, screenWidth), randomSeed.nextInt(0, groundLevel - boxesStartHeight * tileSize));
+            LuckyBox luckyBox = new LuckyBox(this, player);
+            Coin coin = new Coin(this);
+            luckyBox.setCoords(randomSeed.nextInt(0, screenWidth), randomSeed.nextInt(groundLevel - boxesEndHeight * tileSize, groundLevel - boxesStartHeight * tileSize));
+            coin.setCoords(luckyBox.x, luckyBox.y);
+            coins.add(coin);
             boxes.add(luckyBox);
         }
         //World generation logic
@@ -185,6 +191,7 @@ public class GamePanel extends JPanel implements Runnable{
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            internalTime += 1;
         }
     }
     public void update() throws IOException {
@@ -213,7 +220,10 @@ public class GamePanel extends JPanel implements Runnable{
         for(int j = 0; j < topPipes.size(); j++){
             borderCollision(mushroom, topPipes.get(j));
             borderCollision(player, topPipes.get(j));
-            topCollision(player, topPipes.get(j));
+            for(int i = 0; i < coins.size(); i++) {
+                topCollision(coins.get(i), topPipes.get(j));
+            }
+                topCollision(player, topPipes.get(j));
         }
         for(int j = 0; j < sidePipes.size(); j++){
             borderCollision(sidePipes.get(j), mushroom);
@@ -221,15 +231,20 @@ public class GamePanel extends JPanel implements Runnable{
             topCollision(player, sidePipes.get(j));
         }
         for(int j = 0; j < boxes.size(); j++){
-            if(!boxes.get(j).isTouched) {
                 borderCollision(player, boxes.get(j));
                 if (bottomCollision(player, boxes.get(j))) {
-                    score += 1;
+                    coins.get(j).unlock();
                     boxes.get(j).touch();
                 }
                 topCollision(player, boxes.get(j));
-            }
             boxes.get(j).update();
+        }
+        for(int j = 0; j < coins.size(); j++){
+            if((topCollision(player, coins.get(j)) || borderCollision(player, coins.get(j))) && coins.get(j).y > boxesEndHeight * tileSize + 50) {
+                score += 1;
+                coins.get(j).touch();
+            }
+            coins.get(j).update();
         }
         if(!isGameOver && !isGameWin) {
             player.draw(g2);
@@ -240,6 +255,9 @@ public class GamePanel extends JPanel implements Runnable{
             }
             for(int j = 0; j < sidePipes.size(); j++){
                 sidePipes.get(j).draw(g2);
+            }
+            for(int j = 0; j < coins.size(); j++){
+                coins.get(j).draw(g2);
             }
             for(int j = 0; j < boxes.size(); j++){
                 boxes.get(j).draw(g2);

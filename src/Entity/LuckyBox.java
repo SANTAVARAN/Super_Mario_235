@@ -8,10 +8,14 @@ import main.GamePanel;
 public class LuckyBox extends Entity{
     GamePanel gp;
     BufferedImage image;
+    Player player;
+    public int prevTime, prevX, prevY;
+    boolean closeFlag = false;
     public boolean isTouched = false;
-    public LuckyBox(GamePanel gp){
+    public LuckyBox(GamePanel gp, Player player){
         this.gp = gp;
         getBoxImage();
+        this.player = player;
     }
     public int getCoords(boolean type){
         if(type){
@@ -30,8 +34,10 @@ public class LuckyBox extends Entity{
         }
     }
     public void touch(){
+        prevTime = gp.internalTime;
         isTouched = true;
         speed = 5;
+        System.out.println("Box is touched " + prevTime);
     }
     public void setCoords(int x_set, int y_set){
         y = y_set;
@@ -45,7 +51,22 @@ public class LuckyBox extends Entity{
         }
         g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
     }
+
     public void update() {
-        y = y + speed;
+        if(isTouched){
+            if(!closeFlag){
+                prevX = x;
+                prevY = y;
+                prevTime = gp.internalTime;
+                closeFlag = true;
+            }
+            speed = player.speed;
+            if(prevTime + 8 > gp.internalTime){
+                y = y - speed;
+            }
+            else if(!(prevX == x && prevY == y)){
+                y = y + speed;
+            }
+        }
     }
 }
