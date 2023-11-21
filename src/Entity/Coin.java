@@ -66,6 +66,5 @@ public class Coin extends Entity{
                 speed = 1;
             }
         }
-
     }
 }

@@ -41,6 +41,7 @@ public class GamePanel extends JPanel implements Runnable{
     KeyHandler keyHandler = new KeyHandler();
     UI ui = new UI(this);
     Thread gameThread;
+    SoundHandler soundPlayer = new SoundHandler();
 
     //Flags
     boolean isGameOver = false;
@@ -54,9 +55,9 @@ public class GamePanel extends JPanel implements Runnable{
     //Objects initialization
 
     //World generation
-    int boxesStartHeight = 4;
-    int boxesEndHeight = 5;
-    int pipesQuantity = 10;
+    int boxesStartHeight = 5;
+    int boxesEndHeight = 6;
+    int pipesQuantity = 3;
     int boxesQuantity = 3;
     Random randomSeed = new Random();
     ArrayList<Pipe> topPipes = new ArrayList<Pipe>();
@@ -110,8 +111,7 @@ public class GamePanel extends JPanel implements Runnable{
         Rectangle p = new Rectangle(b.x, b.y, tileSize, tileSize);
         if (r.intersects(p) && a.y < b.y)
         {
-            a.calculatedFallSpeed = 0;
-            a.y = b.y - tileSize;
+            a.setFeltState(b.y - tileSize);
             return true;
         }
         return false;
@@ -121,8 +121,7 @@ public class GamePanel extends JPanel implements Runnable{
         Rectangle p = new Rectangle(b.x, b.y, tileSize, tileSize);
         if (r.intersects(p) && a.y > b.y)
         {
-            a.calculatedFallSpeed = 0;
-            a.y = b.y + tileSize;
+            a.setFeltState(b.y + tileSize);
             return true;
         }
         return false;
@@ -154,6 +153,8 @@ public class GamePanel extends JPanel implements Runnable{
     public void gameOver() throws IOException {
         try {
             gameOverImage = ImageIO.read(getClass().getResourceAsStream("/resource/misc/game_over.png"));
+            player.y = 0;
+            player.x = 0;
         }
         catch (IOException e){
             e.printStackTrace();
@@ -202,11 +203,13 @@ public class GamePanel extends JPanel implements Runnable{
             score++;
         }
         if(topCollision(player, princess) || borderCollision(player, princess)){
+            soundPlayer.play("src/resource/sounds/smb_world_clear.wav");
             princess.destroy();
             gameWin();
         }
         if(borderCollision(player, mushroom)){
             try {
+                soundPlayer.play("src/resource/sounds/smb_mariodie.wav");
                 gameOver();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -233,6 +236,7 @@ public class GamePanel extends JPanel implements Runnable{
         for(int j = 0; j < boxes.size(); j++){
                 borderCollision(player, boxes.get(j));
                 if (bottomCollision(player, boxes.get(j))) {
+                    soundPlayer.play("src/resource/sounds/smb_bump.wav");
                     coins.get(j).unlock();
                     boxes.get(j).touch();
                 }
@@ -241,6 +245,7 @@ public class GamePanel extends JPanel implements Runnable{
         }
         for(int j = 0; j < coins.size(); j++){
             if((topCollision(player, coins.get(j)) || borderCollision(player, coins.get(j))) && coins.get(j).y > boxesEndHeight * tileSize + 50) {
+                soundPlayer.play("src/resource/sounds/smb_coin.wav");
                 score += 1;
                 coins.get(j).touch();
             }

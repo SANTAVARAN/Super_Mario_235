@@ -10,4 +10,10 @@ public class Entity {
     public int spriteNum = 1;
     public String prevState;
     public int calculatedFallSpeed = 0;
+    boolean isFelt = true;
+    public void setFeltState(int landingLevel){
+        isFelt = true;
+        calculatedFallSpeed = 0;
+        y = landingLevel;
+    }
 }

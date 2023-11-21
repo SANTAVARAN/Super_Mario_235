@@ -1,6 +1,7 @@
 package Entity;
 import main.GamePanel;
 import main.KeyHandler;
+import main.SoundHandler;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -11,6 +12,7 @@ import java.util.Objects;
 public class Player extends Entity{
     GamePanel gp;
     KeyHandler keyHandler;
+    SoundHandler soundPlayer = new SoundHandler();
     final static double velocity = 1;
     final static int jumpSpeed = 10;
     public BufferedImage image = null;
@@ -44,6 +46,7 @@ public class Player extends Entity{
             e.printStackTrace();
         }
     }
+
     public void update() {
         if(keyHandler.aPressed){
             prevState = state;
@@ -56,9 +59,13 @@ public class Player extends Entity{
             x += speed;
         }
         if(keyHandler.spacePressed){
+            if(isFelt){
+                soundPlayer.play("src/resource/sounds/smb_jump.wav");
+            }
             prevState = state;
             state = "up";
             y -= jumpSpeed;
+            isFelt = false;
         }
         /*if(Objects.equals(prevState, "up") && !Objects.equals(state, "up")){
             //calculatedFallSpeed = -calculatedFallSpeed;
@@ -80,8 +87,7 @@ public class Player extends Entity{
             calculatedFallSpeed += velocity;
         }
         else {
-            calculatedFallSpeed = 0;
-            y = gp.groundLevel;
+            setFeltState(gp.groundLevel);
             if(Objects.equals(prevState, "right")){
                 image = stay_r;
             }
@@ -92,7 +98,6 @@ public class Player extends Entity{
         if(!(keyHandler.aPressed || keyHandler.dPressed || keyHandler.spacePressed)){
             state = "still";
         }
-
     }
     public void draw(Graphics2D g2) {
         switch (state){
